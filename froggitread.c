@@ -2,7 +2,7 @@
 
 static const int MAX_NUM_SENSORS   =    8;
 static const int DEFAULT_VALUE     = 9999;
-static const int RX_PIN            =    2;
+static const int RX_PIN            =    1;
 static const int SHORT_DELAY       =  242;
 static const int LONG_DELAY        =  484;
 static const int NUM_HEADER_BITS   =   10;
@@ -129,16 +129,17 @@ void display_sensor_data()
     int sensor_type = manchester[1];
     int ch = ((manchester[3] & 0x70) / 16) + 1;
     int temp_raw = (manchester[3] & 0x7) * 256 + manchester[4];
-    float temp_fahrenheit = (temp_raw - 400) / 10;
+//    float temp_fahrenheit = (temp_raw - 400) / 10;
     float temp_celsius = (temp_raw - 720) * 0.0556;
     int humidity = manchester[5]; 
     int low_bat = manchester[3] & 0x80 / 128;
     char check_byte = manchester[MAX_BYTES-1];
     char check = checksum(MAX_BYTES-2, manchester+1);
 
-    printf("received message: 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x\n", 
+    
+/*    printf("received message: 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x\n", 
            manchester[0], manchester[1], manchester[2], manchester[3], manchester[4], manchester[5], manchester[6]);
-
+*/
     if (!(sensor_type == 0x45 || sensor_type == 0x46))
         printf("WARN: unknown sensor type 0x%02x received\n", sensor_type);
  
@@ -146,13 +147,17 @@ void display_sensor_data()
         printf("WARN: illegal channel id %d received\n", ch);
   
     if (humidity > 100) 
-        printf("WARN: invalid humidity value received\n", humidity);
+        printf("WARN: invalid humidity value %d received\n", humidity);
     
     if (check != check_byte) {
         printf("checksum error: got %02x but expected %02x\n\n", check_byte, check);
         return;
     }
-
+/*
     printf("Sensor type: 0x%02x, Channel: %d, Temperature: %.1f°C / %.1f°F, Humidity: %d%, Low battery: %d\n\n", 
            sensor_type, ch, temp_celsius, temp_fahrenheit, humidity, low_bat);
+*/  
+    char temp[512];
+    sprintf(temp, "/usr/local/bin/pilight-send -p generic_weather -i %d -t %.1f -h %d -b %d",ch,temp_celsius,humidity,low_bat);
+    system((char *) temp);
 }
