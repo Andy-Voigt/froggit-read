@@ -1,7 +1,7 @@
 CC=gcc
 
 CFLAGS=-std=gnu99
-LIBRARIES=-lwiringPi -lpthread
+LIBRARIES=-lwiringPi -lpthread -lsqlite3
 
 all:  froggitread
 
