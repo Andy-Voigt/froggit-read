@@ -21,10 +21,9 @@ sqlite3 *db;
 int main(int argc, char **argv) 
 {
     if(argv[1] != NULL) {
-         printf("\n %s is argv %d ",argv[1]);
-         sqlite3_open(argv[2], &db);
+         sqlite3_open(argv[1], &db);
     }
-    
+
     init();
     wiringPiISR(RX_PIN, INT_EDGE_BOTH, &read_signal);
     sigsuspend(&myset);
