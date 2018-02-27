@@ -16,9 +16,14 @@ char      num_bits;
 char      num_bytes;
 char      manchester[7];
 sigset_t  myset;
+sqlite3 *db;
 
-int main() 
+int main(int argc, char **argv) 
 {
+    if(argv[2] != NULL) {
+         sqlite3_open(argv[2], &db);
+    }
+    
     init();
     wiringPiISR(RX_PIN, INT_EDGE_BOTH, &read_signal);
     sigsuspend(&myset);
@@ -158,6 +163,13 @@ void display_sensor_data()
            sensor_type, ch, temp_celsius, temp_fahrenheit, humidity, low_bat);
 */  
     char temp[512];
-    sprintf(temp, "/usr/local/bin/pilight-send -p generic_weather -i %d -t %.1f -h %d -b %d",ch,temp_celsius,humidity,low_bat);
+    sprintf(temp, "/usr/local/bin/pilight-send -p generic_weather -i %d -t %.2f -h %d -b %d",ch,temp_celsius,humidity,low_bat);
     system((char *) temp);
+    
+     char *sql = sqlite3_mprintf("INSERT INTO reading " \
+                                "(channel, temperature, humidity, battery) " \
+                                "VALUES (%d, %.2f, %d, %d)", 
+                                ch, temp_celsius, humidity, low_bat);
+    sqlite3_exec(db, sql, 0, 0, 0);
+    sqlite3_free(sql);
 }
