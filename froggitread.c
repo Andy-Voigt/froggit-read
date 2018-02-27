@@ -20,7 +20,8 @@ sqlite3 *db;
 
 int main(int argc, char **argv) 
 {
-    if(argv[2] != NULL) {
+    if(argv[1] != NULL) {
+         printf("\n %s is argv %d ",argv[1]);
          sqlite3_open(argv[2], &db);
     }
     
