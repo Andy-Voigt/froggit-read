@@ -22,6 +22,8 @@ int main(int argc, char **argv)
 {
     if(argv[1] != NULL) {
          sqlite3_open(argv[1], &db);
+    } else {
+        sqlite3_open("froggitread.db", &db);
     }
 
     init();
@@ -144,7 +146,7 @@ void display_sensor_data()
     
 /*    printf("received message: 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x\n", 
            manchester[0], manchester[1], manchester[2], manchester[3], manchester[4], manchester[5], manchester[6]);
-*/
+
     if (!(sensor_type == 0x45 || sensor_type == 0x46))
         printf("WARN: unknown sensor type 0x%02x received\n", sensor_type);
  
@@ -158,7 +160,7 @@ void display_sensor_data()
         printf("checksum error: got %02x but expected %02x\n\n", check_byte, check);
         return;
     }
-/*
+
     printf("Sensor type: 0x%02x, Channel: %d, Temperature: %.1f°C / %.1f°F, Humidity: %d%, Low battery: %d\n\n", 
            sensor_type, ch, temp_celsius, temp_fahrenheit, humidity, low_bat);
 */  
@@ -168,7 +170,7 @@ void display_sensor_data()
     
      char *sql = sqlite3_mprintf("INSERT INTO reading " \
                                 "(channel, temperature, humidity, battery) " \
-                                "VALUES (%d, %.2f, %d, %d)", 
+                                "VALUES (%d, %d, %d, %d)", 
                                 ch, temp_celsius, humidity, low_bat);
     sqlite3_exec(db, sql, 0, 0, 0);
     sqlite3_free(sql);
