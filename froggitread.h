@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <signal.h>
 
+#include <sqlite3.h>
 #include <wiringPi.h>
 
 int init();
